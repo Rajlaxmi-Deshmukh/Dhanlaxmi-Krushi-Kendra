@@ -16,6 +16,8 @@ const Product = require("./models/Product");
 const Order = require("./models/Order");
 
 const app = express();
+const FRONTEND_DIR = path.join(__dirname, "../Frontend");
+const UPLOADS_DIR = path.join(__dirname, "uploads");
 
 /* =======================
    DATABASE CONNECTION
@@ -48,8 +50,8 @@ app.use(express.json());
 /* =======================
    STATIC FILES
 ======================= */
-app.use("/uploads", express.static("uploads"));
-app.use(express.static(path.join(__dirname, "../frontend")));
+app.use("/uploads", express.static(UPLOADS_DIR));
+app.use(express.static(FRONTEND_DIR));
 
 /* =======================
    API ROUTES
@@ -195,63 +197,63 @@ app.get("/api/stream/orders", (req, res) => {
    FRONTEND ROUTES
 ======================= */
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/login.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "login.html"));
 });
 
 app.get("/admin-login", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/admin-login.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "admin-login.html"));
 });
 
 app.get("/user-login", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/user-login.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "user-login.html"));
 });
 
 app.get("/signup", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/signup.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "signup.html"));
 });
 
 app.get("/signin", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/signup.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "signup.html"));
 });
 
 app.get("/home", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/home.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "home.html"));
 });
 
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/admin.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "admin.html"));
 });
 
 app.get("/orders", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/orders.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "orders.html"));
 });
 
 app.get("/cart", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/cart.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "cart.html"));
 });
 
 app.get("/about", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/aboutus.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "aboutus.html"));
 });
 
 app.get("/products", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/products.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "products.html"));
 });
 
 app.get("/schedule", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/schedule.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "schedule.html"));
 });
 
 app.get("/payment", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/payment.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "payment.html"));
 });
 
 app.get("/fertilizers", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/products.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "products.html"));
 });
 
 app.get("/herbicides", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/products.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "products.html"));
 });
 
 /* =======================
