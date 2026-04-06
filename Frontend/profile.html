@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile | Dhanalaxmi Krushi Kendra</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav>
+    <div class="logo">
+        <img src="logo.png" alt="Logo">
+        <span class="logo-text">à¤§à¤¨à¤²à¤•à¥à¤·à¥à¤®à¥€ à¤•à¥ƒà¤·à¥€ à¤•à¥‡à¤‚à¤¦à¥à¤°</span>
+        <span id="nav-username"></span>
+    </div>
+    <ul>
+<li><a href="home.html">Home</a></li>
+<li><a href="products.html">Products</a></li>
+<li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+<li id="orders-link" style="display:none;"><a href="orders.html">My Orders</a></li>
+<li><a href="aboutus.html">About</a></li>
+<li id="profile-link" style="display:none;"><a href="user-dashboard.html">Profile</a></li>
+<li id="logout-link" class="nav-right" style="display:none;"><a href="#" onclick="logout()">Logout</a></li>
+<li><a id="login-link" href="login.html">Login</a></li>
+</ul>
+</nav>
+
+<section>
+    <h2>My Profile</h2>
+    <p id="profile-name"></p>
+
+    <h3 style="margin-top:20px;">Recent Orders</h3>
+    <div id="my-orders"></div>
+</section>
+
+<footer>Â© 2025 Dhanalaxmi Krushi Kendra</footer>
+
+<script src="script.js"></script>
+<script>
+    const name = localStorage.getItem("username");
+    const el = document.getElementById("profile-name");
+    if (el) el.innerText = name ? `Name: ${name}` : "Name: Guest";
+</script>
+</body>
+</html>
+
+
+

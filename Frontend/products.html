@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products | Dhanalaxmi Krushi Kendra</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    
+<nav>
+<div class="logo">
+    <img src="logo.png" alt="धनलक्ष्मी कृषी केंद्र">
+    <span class="logo-text">धनलक्ष्मी कृषी केंद्र</span>
+</div>
+    <ul>
+<li><a href="home.html">Home</a></li>
+<li><a href="products.html">Products</a></li>
+<li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+<li id="orders-link" style="display:none;"><a href="orders.html">My Orders</a></li>
+<li><a href="aboutus.html">About</a></li>
+<li><a href="schedule.html">Contact Us</a></li>
+<li id="profile-link" style="display:none;"><a href="user-dashboard.html">Profile</a></li>
+<li id="logout-link" class="nav-right" style="display:none;"><a href="#" onclick="logout()">Logout</a></li>
+<li><a id="login-link" href="login.html">Login</a></li>
+</ul>
+</nav>
+<div class="products-toolbar">
+  <div class="category-tabs product-tabs">
+    <button class="tab active" onclick="loadAllProducts(this)">All</button>
+    <button class="tab" onclick="loadByCategory('herbicide', this)">Herbicides</button>
+    <button class="tab" onclick="loadByCategory('fertilizer', this)">Fertilizers</button>
+    <button class="tab" onclick="loadByCategory('pesticide', this)">Pesticides</button>
+  </div>
+  <div class="search-wrap">
+    <input
+      type="text"
+      id="search"
+      placeholder="Search product..."
+      onkeyup="searchProducts()"
+    />
+    <button class="search-btn" type="button" onclick="searchProducts()" aria-label="Search">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<section class="products-section">
+  <h2>Products</h2>
+  <div id="product-list" class="grid"></div>
+</section>
+
+
+<script src="script.js"></script>
+<footer>
+    <p style="text-align:center;">© 2025 Dhanalaxmi Krushi Kendra</p>
+</footer>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders | Dhanalaxmi Krushi Kendra</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <img src="logo.png">
+    <span class="logo-text">Dhanalaxmi Krushi Kendra</span>
+  </div>
+  <ul>
+    <li><a href="home.html">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+    <li id="orders-link" style="display:none;"><a href="orders.html">My Orders</a></li>
+    <li><a href="aboutus.html">About</a></li>
+    <li><a href="schedule.html">Contact Us</a></li>
+    <li id="profile-link" style="display:none;"><a href="user-dashboard.html">Profile</a></li>
+    <li id="logout-link" class="nav-right" style="display:none;"><a href="#" onclick="logout()">Logout</a></li>
+    <li><a id="login-link" href="login.html">Login</a></li>
+  </ul>
+</nav>
+
+<section style="padding:60px 8%;">
+  <h2>My Orders</h2>
+  <div id="my-orders"></div>
+</section>
+
+<footer>&copy; 2025 Dhanalaxmi Krushi Kendra</footer>
+
+<script src="script.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    startOrdersSse();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Login</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="login-page">
+
+<nav>
+<div class="logo">
+<img src="logo.png">
+<span class="logo-text">User Login</span>
+</div>
+</nav>
+
+<div class="login-main">
+<div class="login-card">
+<h2>User Login</h2>
+<form id="userLoginForm">
+  <input id="mobile" name="mobile" placeholder="Mobile Number"/>
+  <div class="password-field">
+    <input id="password" name="password" type="password" placeholder="Password" class="password-input" />
+    <button type="button" class="password-toggle" id="toggle-password" aria-label="Show password">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path>
+        <circle cx="12" cy="12" r="3.2"></circle>
+      </svg>
+      <span class="toggle-text">Show</span>
+    </button>
+  </div>
+  <div class="remember-row">
+    <label class="remember-label" for="remember-user">
+      <input type="checkbox" id="remember-user">
+      <span>Remember me</span>
+    </label>
+  </div>
+  <button>Login</button>
+  <p class="helper">New User? Click here to <a href="signup.html">register</a></p>
+
+</form>
+<script src="user-login.js"></script>
+
+
+</div>
+</div>
+
+<footer>© 2025 Dhanalaxmi Krushi Kendra</footer>
+</body>
+</html>
+
+
+
+
+

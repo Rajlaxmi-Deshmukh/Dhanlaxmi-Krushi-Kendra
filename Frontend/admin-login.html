@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+
+<nav>
+  <div class="logo">
+    <img src="logo.png">
+    <span class="logo-text">Admin Login</span>
+  </div>
+</nav>
+
+<div class="login-main">
+  <div class="login-card">
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <input id="adminUser" placeholder="Username" />
+      <div class="password-field">
+        <input id="adminPass" type="password" placeholder="Password" class="password-input" />
+        <button type="button" class="password-toggle" id="toggle-admin-password" aria-label="Show password">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"></path>
+            <circle cx="12" cy="12" r="3.2"></circle>
+          </svg>
+          <span class="toggle-text">Show</span>
+        </button>
+      </div>
+      <div class="remember-row">
+        <label class="remember-label" for="remember-admin">
+          <input type="checkbox" id="remember-admin">
+          <span>Remember me</span>
+        </label>
+      </div>
+      <button class="btn-primary" type="submit">Login</button>
+    </form>
+  </div>
+</div>
+
+<footer>© 2025 Dhanalaxmi Krushi Kendra</footer>
+<script src="admin-login.js"></script>
+</body>
+</html>
+
+
+
+
+

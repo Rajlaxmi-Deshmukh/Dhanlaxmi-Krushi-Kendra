@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body onload="loadCart()">
+
+<nav>
+  <div class="logo">
+    <img src="logo.png">
+    <span class="logo-text">Dhanalaxmi Krushi Kendra</span>
+  </div>
+  <ul>
+    <li><a href="home.html">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+    <li id="orders-link" style="display:none;"><a href="orders.html">My Orders</a></li>
+    <li><a href="aboutus.html">About</a></li>
+    <li><a href="schedule.html">Contact Us</a></li>
+    <li id="profile-link" style="display:none;"><a href="user-dashboard.html">Profile</a></li>
+    <li id="logout-link" class="nav-right" style="display:none;"><a href="#" onclick="logout()">Logout</a></li>
+    <li><a id="login-link" href="login.html">Login</a></li>
+  </ul>
+</nav>
+
+<section>
+  <h2>My Cart</h2>
+  <div id="cart-list"></div>
+  <h3>Total: Rs.<span id="total">0</span></h3>
+  <button class="btn" onclick="checkout()">Place Order</button>
+</section>
+
+<footer>&copy; 2025 Dhanalaxmi Krushi Kendra</footer>
+<script src="script.js"></script>
+</body>
+</html>

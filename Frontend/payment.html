@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment | Dhanalaxmi Krushi Kendra</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <img src="logo.png" alt="Logo">
+    <span class="logo-text">Payment</span>
+  </div>
+  <ul>
+    <li><a href="home.html">Home</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="schedule.html">Contact Us</a></li>
+    <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+    <li id="orders-link" style="display:none;"><a href="orders.html">My Orders</a></li>
+    <li id="profile-link" style="display:none;"><a href="user-dashboard.html">Profile</a></li>
+    <li id="logout-link" class="nav-right" style="display:none;"><a href="#" onclick="logout()">Logout</a></li>
+    <li><a id="login-link" href="login.html">Login</a></li>
+  </ul>
+</nav>
+
+<section class="orders-section">
+  <h2>Order Summary</h2>
+  <div id="order-summary"></div>
+
+  <div class="payment-card">
+    <h2>Choose Payment Option</h2>
+    <p id="payment-message" style="display:none;"></p>
+    <div class="payment-options">
+      <button class="btn-primary payment-btn" onclick="choosePayment('Pay on Shop')">Pay on Shop</button>
+      <button class="btn-primary payment-btn" onclick="choosePayment('Pay by QR')">Pay by QR</button>
+    </div>
+    <div class="qr-section" id="qr-section" style="display:none;">
+      <p class="qr-title">Scan BharatQR to Pay</p>
+      <img src="BharatQR.jpeg" alt="BharatQR" class="qr-image">
+      <p class="qr-note">After payment is done, retailer will contact you shortly and confirm your order. Thank you 🙏🏻.</p>
+    </div>
+  </div>
+
+  <div class="payment-status-card" id="payment-status-card" style="display:none;">
+    <h3>Payment Status</h3>
+    <p id="payment-status-text"></p>
+    <button class="btn-primary" onclick="window.location.href='user-dashboard.html'">Go to Dashboard</button>
+  </div>
+</section>
+
+<footer>&copy; 2025 Dhanalaxmi Krushi Kendra</footer>
+<script src="script.js"></script>
+<script>
+  (async () => {
+    const orderId = localStorage.getItem("last_order_id");
+    const summary = document.getElementById("order-summary");
+    const statusCard = document.getElementById("payment-status-card");
+    const statusText = document.getElementById("payment-status-text");
+    if (!orderId || !summary) return;
+
+    document.body.dataset.orderId = orderId;
+    if (!localStorage.getItem("last_order_id")) {
+      localStorage.setItem("last_order_id", orderId);
+    }
+
+    const res = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+      headers: { ...getAuthHeaders() }
+    });
+    const order = await res.json();
+
+    if (!res.ok) {
+      if (res.status === 403) {
+        localStorage.removeItem("last_order_id");
+        summary.innerHTML = "<p>This order is not linked to your current login. Please place a new order from cart.</p>";
+        const options = document.querySelector(".payment-card");
+        if (options) options.style.display = "none";
+        return;
+      }
+      localStorage.removeItem("last_order_id");
+      summary.innerHTML = "<p>Order not available. Please place a new order.</p>";
+      const options = document.querySelector(".payment-card");
+      if (options) options.style.display = "none";
+      return;
+    }
+
+    const items = order.items || [];
+    const total = items.reduce((sum, i) => {
+      const price = i.price || i.product?.price || 0;
+      return sum + price * i.qty;
+    }, 0);
+
+    summary.innerHTML = `
+      <div class="order-card">
+        <div class="order-items">
+          ${items.map(i => `
+            <div class="order-item">
+              <img src="${i.product?.image || ""}" alt="${i.product?.name || "Product"}">
+              <div class="order-item-details">
+                <p><strong>${i.product?.name || "Product"}</strong></p>
+                <p>Qty: ${i.qty} • Rs.${i.price || i.product?.price || 0}</p>
+              </div>
+              <div>Rs.${(i.price || i.product?.price || 0) * i.qty}</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="order-total">Total: Rs.${total}</div>
+      </div>
+    `;
+
+    if (statusCard && statusText) {
+      const hasMethod = order.paymentMethod && order.paymentMethod !== "Pending";
+      if (hasMethod) {
+        const paid = order.paymentStatus === "Confirmed";
+        statusText.innerText = paid
+          ? "Payment successful. Your order is confirmed."
+          : "Payment pending. Complete payment to confirm your order.";
+        statusCard.style.display = "block";
+      } else {
+        statusCard.style.display = "none";
+      }
+    }
+  })();
+</script>
+</body>
+</html>

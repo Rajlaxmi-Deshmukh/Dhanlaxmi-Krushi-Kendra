@@ -1,0 +1,235 @@
+const Order = require("../models/Order");
+const Product = require("../models/Product");
+const Cart = require("../models/Cart");
+const crypto = require("crypto");
+const { notifyAdmins, notifyUser } = require("./notificationController");
+
+function getOrderUserId(order) {
+  if (!order || !order.user) return null;
+  if (order.user._id) return order.user._id.toString();
+  return order.user.toString();
+}
+
+// CREATE ORDER (USER)
+exports.createOrder = async (req, res) => {
+  try {
+    if (!req.user?.id || req.user?.role !== "user") {
+      return res.status(403).json({ message: "Please login as user to place order" });
+    }
+
+    if (!Array.isArray(req.body?.items) || req.body.items.length === 0) {
+      return res.status(400).json({ message: "Cart is empty" });
+    }
+
+    const order = new Order({
+      user: req.user.id,
+      items: req.body.items,
+      status: "Pending",
+      paymentStatus: "Pending",
+      paymentMethod: "Pending"
+    });
+
+    await order.save();
+
+    try {
+      await Cart.findOneAndDelete({ user: req.user.id });
+    } catch (cartErr) {
+      console.error("CART CLEAR ERROR AFTER ORDER:", cartErr);
+    }
+
+    res.status(201).json(order);
+
+    const populatedOrder = await Order.findById(order._id)
+      .populate("user", "name")
+      .populate("items.product", "name");
+
+    const userName = populatedOrder?.user?.name || "User";
+    const productNames = (populatedOrder?.items || [])
+      .map(i => i.product?.name)
+      .filter(Boolean);
+    const productsText = productNames.length ? productNames.join(", ") : "Products";
+
+    notifyAdmins(
+      "New Order Placed",
+      `${userName} placed a new order for: ${productsText}.`,
+      { orderId: String(order._id), userName, products: productNames },
+      "order_placed"
+    );
+  } catch (err) {
+    console.error("CREATE ORDER ERROR:", err);
+    res.status(500).json({ message: "Order failed" });
+  }
+};
+
+exports.setPaymentMethod = async (req, res) => {
+  try {
+    const { method } = req.body || {};
+    if (!method) {
+      return res.status(400).json({ message: "Payment method required" });
+    }
+
+    const order = await Order.findById(req.params.id)
+      .populate("items.product")
+      .populate("user", "name");
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    if (getOrderUserId(order) !== req.user.id) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    order.paymentMethod = method;
+    order.paymentProvider = "Manual";
+    order.paymentStatus = method === "Pay by QR" ? "Pending" : "Selected";
+    await order.save();
+
+    res.json({ message: "Payment method saved", orderId: order._id });
+  } catch (err) {
+    res.status(500).json({ message: "Payment update failed" });
+  }
+};
+
+
+exports.confirmPayment = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate("user", "name")
+      .populate("items.product");
+
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    if (order.paymentMethod !== "Pay by QR") {
+      return res.status(400).json({ message: "Only Pay by QR can be confirmed here" });
+    }
+    if (order.status !== "Pending") {
+      return res.status(400).json({ message: "Order already processed" });
+    }
+
+    for (let item of order.items) {
+      if (item.product.quantity < item.qty) {
+        return res.status(400).json({
+          message: `Insufficient stock for ${item.product.name}`
+        });
+      }
+      item.product.quantity -= item.qty;
+      await item.product.save();
+    }
+
+    order.paymentStatus = "Confirmed";
+    order.status = "Approved";
+    await order.save();
+
+    res.json({ message: "Payment confirmed & order approved" });
+    notifyUser(order.user, "Payment Received", `Payment confirmed for order ${order._id}`, { orderId: String(order._id) });
+  } catch (err) {
+    res.status(500).json({ message: "Payment confirm failed" });
+  }
+};
+
+// GET ALL ORDERS (ADMIN)
+exports.getOrders = async (req, res) => {
+  const orders = await Order.find()
+    .populate("user", "name")
+    .populate("items.product")
+    .sort({ createdAt: -1 });
+  res.json(orders);
+};
+
+exports.getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user.id })
+      .populate("items.product")
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch user orders" });
+  }
+};
+
+exports.getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate("items.product")
+      .populate("user", "name");
+
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    if (order.user._id.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch order" });
+  }
+};
+
+exports.approveOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id).populate("items.product");
+
+  if (!order) return res.status(404).json({ message: "Order not found" });
+  if (order.paymentMethod !== "Pay on Shop") {
+    return res.status(400).json({ message: "Only Pay on Shop orders can be approved" });
+  }
+  if (order.status !== "Pending")
+    return res.status(400).json({ message: "Already processed" });
+
+  for (let item of order.items) {
+    if (item.product.quantity < item.qty) {
+      return res.status(400).json({
+        message: `Insufficient stock for ${item.product.name}`
+      });
+    }
+
+    item.product.quantity -= item.qty;
+    await item.product.save();
+  }
+
+  order.status = "Approved";
+  await order.save();
+
+  res.json({ message: "Order approved & stock updated" });
+  notifyUser(order.user, "Order Approved", `Your order ${order._id} is approved`, { orderId: String(order._id) });
+};
+
+exports.cancelOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id).populate("items.product");
+
+  if (!order) return res.status(404).json({ message: "Order not found" });
+
+  if (getOrderUserId(order) !== req.user.id)
+    return res.status(403).json({ message: "Not allowed" });
+
+  // ✅ restore stock ONLY if approved
+  if (order.status === "Approved") {
+    for (let item of order.items) {
+      item.product.quantity += item.qty;
+      await item.product.save();
+    }
+  }
+
+  order.status = "Cancelled";
+  await order.save();
+
+  res.json({ message: "Order cancelled & stock restored" });
+  notifyUser(order.user, "Order Cancelled", `Your order ${order._id} is cancelled`, { orderId: String(order._id) });
+};
+
+// ADMIN: REJECT ORDER
+exports.rejectOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    if (order.paymentMethod !== "Pay on Shop") {
+      return res.status(400).json({ message: "Only Pay on Shop orders can be rejected" });
+    }
+    if (order.status !== "Pending") {
+      return res.status(400).json({ message: "Already processed" });
+    }
+
+    order.status = "Cancelled";
+    await order.save();
+    res.json({ message: "Order rejected" });
+    notifyUser(order.user, "Order Rejected", `Your order ${order._id} is rejected`, { orderId: String(order._id) });
+  } catch (err) {
+    res.status(500).json({ message: "Reject failed" });
+  }
+};
