@@ -1,7 +1,7 @@
 /* =========================================================
    CONFIG
 ========================================================= */
-const API = "http://localhost:5000/api";
+const API = `${window.location.origin}/api`;
 
 function getStoredItem(key) {
   return localStorage.getItem(key) || sessionStorage.getItem(key);
@@ -46,7 +46,7 @@ function updateCartCount() {
     return;
   }
 
-  fetch("http://localhost:5000/api/cart", { headers })
+  fetch(`${API}/cart`, { headers })
     .then(res => (res.ok ? res.json() : { items: [] }))
     .then(data => {
       const count = (data.items || []).reduce((sum, item) => sum + item.qty, 0);
@@ -70,7 +70,7 @@ function addToCart(productId) {
     if (max && qty > max) qty = max;
   }
 
-  fetch("http://localhost:5000/api/cart", {
+  fetch(`${API}/cart`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -85,7 +85,7 @@ function addToCart(productId) {
     });
 }
 function loadCart() {
-  fetch("http://localhost:5000/api/cart", {
+  fetch(`${API}/cart`, {
     headers: { ...getAuthHeaders() }
   })
     .then(res => res.json())
@@ -132,7 +132,7 @@ function loadCart() {
 function cancelOrder(orderId) {
   const ok = confirm("Are you sure you want to cancel this order?");
   if (!ok) return;
-  fetch(`http://localhost:5000/api/orders/${orderId}/cancel`, {
+  fetch(`${API}/orders/${orderId}/cancel`, {
     method: "PUT",
     headers: { ...getAuthHeaders() }
   })
@@ -144,7 +144,7 @@ function cancelOrder(orderId) {
 }
 
 function updateQty(productId, qty) {
-  fetch("http://localhost:5000/api/cart/update", {
+  fetch(`${API}/cart/update`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -156,7 +156,7 @@ function updateQty(productId, qty) {
 }
 
 function removeCartItem(productId) {
-  fetch("http://localhost:5000/api/cart/update", {
+  fetch(`${API}/cart/update`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -182,7 +182,7 @@ async function checkout() {
   }
 
   try {
-    const cartRes = await fetch("http://localhost:5000/api/cart", { headers });
+    const cartRes = await fetch(`${API}/cart`, { headers });
     const cartData = await cartRes.json();
 
     if (!cartRes.ok) {
@@ -201,7 +201,7 @@ async function checkout() {
       price: i.product?.price || 0
     }));
 
-    const orderRes = await fetch("http://localhost:5000/api/orders", {
+    const orderRes = await fetch(`${API}/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -330,7 +330,7 @@ async function clearCartAfterPayment() {
   const headers = getAuthHeaders();
   if (!headers.Authorization) return;
   try {
-    await fetch("http://localhost:5000/api/cart", {
+    await fetch(`${API}/cart`, {
       method: "DELETE",
       headers
     });
@@ -943,7 +943,7 @@ function renderMyOrders(filter = "all") {
 function loadMyOrders() {
   if (!document.getElementById("my-orders")) return;
 
-  fetch("http://localhost:5000/api/orders/my", {
+  fetch(`${API}/orders/my`, {
     headers: { ...getAuthHeaders() }
   })
     .then(res => res.json())
@@ -1143,7 +1143,7 @@ function choosePayment(method) {
     return;
   }
 
-  fetch(`http://localhost:5000/api/orders/${orderId}/payment`, {
+  fetch(`${API}/orders/${orderId}/payment`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -1201,5 +1201,6 @@ function choosePayment(method) {
 }
 
 // Razorpay removed
+
 
 
